@@ -1,0 +1,223 @@
+package com.juan.loginclient;
+
+ 
+
+import java.io.BufferedReader;
+
+import java.io.File;
+
+import java.io.FileReader;
+
+import java.io.FileWriter;
+
+import java.io.IOException;
+
+import java.io.PrintWriter;
+
+import java.util.Base64;
+
+ 
+
+import javax.swing.JOptionPane;
+
+ 
+
+public class LoginClient {
+
+ 
+
+    public static void main(String[] args) {
+
+        execute();
+
+    }
+
+ 
+
+    private static void execute() {
+
+        String path=getAppPath();
+
+        String urlUsuario=null;
+
+        if(path==null) {
+
+            JOptionPane.showMessageDialog(null, "Caminho não encontrado! Aplicação fechará.", "Login Client", JOptionPane.ERROR_MESSAGE);
+
+            System.exit(0);
+
+        }
+
+ 
+
+        String fullPath=path+"\\login.cfg";
+
+        if(!fileExists(fullPath)) {
+
+            String matricula=null;
+
+            matricula=JOptionPane.showInputDialog("Digite seu Login:");
+
+            writeFile(fullPath,matricula);
+
+        }
+
+ 
+
+        urlUsuario = readCFGFile(fullPath);
+
+        if(urlUsuario==null) {
+
+            JOptionPane.showMessageDialog(null, "Url não encontrada! Aplicação fechará.", "Login Client", JOptionPane.ERROR_MESSAGE);
+
+            System.exit(0);
+
+        }
+
+        openBrowser(urlUsuario);
+
+        System.exit(0);
+
+    }
+
+ 
+
+ 
+
+ 
+
+    private static void writeFile(String fullPath, String matricula) {
+
+        FileWriter arq;
+
+        try {
+
+            arq = new FileWriter(fullPath);
+
+            PrintWriter gravarArq = new PrintWriter(arq);
+
+            String originalInput = matricula;
+
+            String encodedString = Base64.getEncoder().encodeToString(originalInput.getBytes());
+
+            gravarArq.printf("login.html?&user="+encodedString+"&pass=xxxxxxxxx");
+
+            arq.close();
+
+ 
+
+        } catch (IOException e) {
+
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+
+        }
+
+ 
+
+    }
+
+ 
+
+    private static void openBrowser(String urlUsuario) {
+
+        try {
+
+            System.out.println(urlUsuario);
+
+            Runtime.getRuntime().exec("rundll32 SHELL32.DLL,ShellExec_RunDLL iexplore " + urlUsuario);
+
+        } catch (IOException e) {
+
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+
+        }
+
+ 
+
+    }
+
+ 
+
+    private static String readCFGFile(String fullPath) {
+
+        BufferedReader br;
+
+        String linha = null;
+
+        try {
+
+            br = new BufferedReader(new    FileReader(fullPath));
+
+            linha = br.readLine();
+
+            System.out.println(linha);
+
+            br.close();
+
+        } catch (IOException e) {
+
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+
+        }
+
+ 
+
+        return linha;
+
+    }
+
+ 
+
+    private static String getAppPath() {
+
+        File dir1 = new File (".");
+
+        String pathSistena=null;
+
+        try {
+
+            pathSistena = dir1.getCanonicalPath().toLowerCase();
+
+        } catch (IOException e) {
+
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+
+        }
+
+        return pathSistena;
+
+    }
+
+ 
+
+    private static boolean fileExists(String filePath) {
+
+        File file = new File(filePath);
+
+        if(file.exists()) {
+
+            return true;
+
+            //file = new File("result.xml");
+
+        }
+
+        else {
+
+            return false;
+
+        }
+
+    }
+
+}
+
+ 
